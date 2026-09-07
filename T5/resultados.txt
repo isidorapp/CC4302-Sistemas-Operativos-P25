@@ -1,0 +1,668 @@
+Sistema operativo utilizado:
+Description:	Debian GNU/Linux 12 (bookworm)
+Versión del núcleo de linux:
+Linux debian12 6.1.0-18-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.76-1 (2024-02-01) x86_64 GNU/Linux
+==== run-san ====
+gcc -g -DSAN=1 -fsanitize=address -fsanitize=undefined -Wall -Werror -pedantic -DNTHREADS -std=c18 -InKernel  test-pedir.c pedir.c nKernel/nthread.c nKernel/nutil.c nKernel/ntime.c nKernel/pss.c nKernel/sched-fcfs.c nKernel/sched-rr.c nKernel/sched-pri-1core.c nKernel/sched-fcfs-1core.c nKernel/sem.c nKernel/mutex-cond.c nKernel/nmsgs.c nKernel/nsystem.c -lm -lpthread -lrt -o pedir.bin-san
+--------------------------------------------
+./pedir.bin-san
+Info: setting single-core FCFS scheduling
+El ejemplo del enunciado
+------------------------
+
+Tpo=0: T1 (thread 1) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:                     T3 (thread 2) invoca nPedir(0)
+Tpo=2:           T2 (thread 3) invoca nPedir(1)
+Tpo=3:                                         T5 (thread 4) invoca nPedir(0)
+Tpo=3: Esperando que T1 termine
+Tpo=4: T1 devuelve recurso
+Tpo=4:           T2 cat 1 obtiene recurso
+Tpo=4: T1 termino
+Tpo=5:                               T4 (thread 5) invoca nPedir(1)
+Tpo=6:           T2 devuelve recurso
+Tpo=6:                     T3 cat 0 obtiene recurso
+Tpo=6:           Esperando que T2 termine
+Tpo=6:           T2 termino
+Tpo=6:                     Esperando que T3 termine
+Tpo=7:                     T3 devuelve recurso
+Tpo=7:                               T4 cat 1 obtiene recurso
+Tpo=7:                     T3 termino
+Tpo=7:                               Esperando que T4 termine
+Tpo=8:                               T4 devuelve recurso
+Tpo=8:                                         T5 cat 0 obtiene recurso
+Tpo=8:                               T4 termino
+Tpo=8:                                         Esperando que T5 termine
+Tpo=9:                                         T5 devuelve recurso
+Tpo=9:                                         T5 termino
+
+Test timeout 1, revisamos que se respete el timeout 4
+----------------
+
+Tpo=0: T1 (thread 6) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 7) invoca nPedir(0)
+Tpo=2:                               T4 (thread 8) invoca nPedir(0)
+Tpo=5:           T2 (thread 7) Timeout!! ta=5 to=4
+Tpo=5:                     T3 (thread 9) invoca nPedir(0)
+Tpo=10: T1 devuelve recurso
+Tpo=10:                               T4 cat 0 obtiene recurso
+Tpo=10:                                         T5 (thread 10) invoca nPedir(1)
+Tpo=11:                                                   T6 (thread 11) invoca nPedir(1)
+Tpo=12:                               T4 devuelve recurso
+Tpo=12:                                         T5 cat 1 obtiene recurso
+Tpo=14:                                         T5 devuelve recurso
+Tpo=14:                     T3 cat 0 obtiene recurso
+Tpo=16:                     T3 devuelve recurso
+Tpo=16:                                                   T6 cat 1 obtiene recurso
+Tpo=18:                                                   T6 devuelve recurso
+
+Test timeout 2, revisamos que toma el recurso antes del timeout
+----------------
+
+Tpo=0: T1 (thread 12) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 13) invoca nPedir(0)
+Tpo=5: T1 devuelve recurso
+Tpo=5:           T2 cat 0 obtiene recurso
+Tpo=7:           T2 devuelve recurso
+
+Test de robustez
+----------------
+
+
+Toma un poco mas de 10 segundos
+t1 t2 t3 ... significa que ese thread comenzo a trabajar
+
+Core 0, cat 0 
+
+t14 Core 1, cat 1 
+
+t15 Core 2, cat 0 
+
+t16 Core 3, cat 1 
+
+t17 Core 4, cat 0 
+
+t18 Core 5, cat 1 
+
+t19 Core 6, cat 0 
+
+t20 Core 7, cat 1 
+
+t21 
+Numero de entradas/salidas = 2871898
+En mi computador make run reporto unas 10 mil entradas/salidas con 3 threads
+
+Felicitaciones: funciona
+Info: Number of cores = 1
+Info: total context changes = 73
+Info: Implicit context changes = 0
+--------------------------------------------
+./pedir.bin-san -slice 1
+Info: setting 1-core round robin scheduling
+El ejemplo del enunciado
+------------------------
+
+Tpo=0: T1 (thread 1) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:                     T3 (thread 2) invoca nPedir(0)
+Tpo=2:           T2 (thread 3) invoca nPedir(1)
+Tpo=3:                                         T5 (thread 4) invoca nPedir(0)
+Tpo=3: Esperando que T1 termine
+Tpo=4: T1 devuelve recurso
+Tpo=4: T1 termino
+Tpo=4:           T2 cat 1 obtiene recurso
+Tpo=5:                               T4 (thread 5) invoca nPedir(1)
+Tpo=6:           T2 devuelve recurso
+Tpo=6:                     T3 cat 0 obtiene recurso
+Tpo=6:           Esperando que T2 termine
+Tpo=6:           T2 termino
+Tpo=6:                     Esperando que T3 termine
+Tpo=7:                     T3 devuelve recurso
+Tpo=7:                     T3 termino
+Tpo=7:                               Esperando que T4 termine
+Tpo=7:                               T4 cat 1 obtiene recurso
+Tpo=8:                               T4 devuelve recurso
+Tpo=8:                               T4 termino
+Tpo=8:                                         Esperando que T5 termine
+Tpo=8:                                         T5 cat 0 obtiene recurso
+Tpo=9:                                         T5 devuelve recurso
+Tpo=9:                                         T5 termino
+
+Test timeout 1, revisamos que se respete el timeout 4
+----------------
+
+Tpo=0: T1 (thread 6) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 7) invoca nPedir(0)
+Tpo=2:                               T4 (thread 8) invoca nPedir(0)
+Tpo=5:           T2 (thread 7) Timeout!! ta=5 to=4
+Tpo=5:                     T3 (thread 9) invoca nPedir(0)
+Tpo=10: T1 devuelve recurso
+Tpo=10:                               T4 cat 0 obtiene recurso
+Tpo=10:                                         T5 (thread 10) invoca nPedir(1)
+Tpo=11:                                                   T6 (thread 11) invoca nPedir(1)
+Tpo=12:                               T4 devuelve recurso
+Tpo=12:                                         T5 cat 1 obtiene recurso
+Tpo=14:                                         T5 devuelve recurso
+Tpo=14:                     T3 cat 0 obtiene recurso
+Tpo=16:                     T3 devuelve recurso
+Tpo=16:                                                   T6 cat 1 obtiene recurso
+Tpo=18:                                                   T6 devuelve recurso
+
+Test timeout 2, revisamos que toma el recurso antes del timeout
+----------------
+
+Tpo=0: T1 (thread 12) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 13) invoca nPedir(0)
+Tpo=5: T1 devuelve recurso
+Tpo=5:           T2 cat 0 obtiene recurso
+Tpo=7:           T2 devuelve recurso
+
+Test de robustez
+----------------
+
+
+Toma un poco mas de 10 segundos
+t1 t2 t3 ... significa que ese thread comenzo a trabajar
+
+Core 0, cat 0 
+
+t14 Core 1, cat 1 
+
+t15 Core 2, cat 0 
+
+t16 Core 3, cat 1 
+
+t17 Core 4, cat 0 
+
+t18 Core 5, cat 1 
+
+t19 Core 6, cat 0 
+
+t20 Core 7, cat 1 
+
+t21 
+Numero de entradas/salidas = 725108
+En mi computador make run reporto unas 10 mil entradas/salidas con 3 threads
+
+Felicitaciones: funciona
+Info: Number of cores = 1
+Info: total context changes = 571869
+Info: Implicit context changes = 430
+==== run-g ====
+gcc -g -Wall -Werror -pedantic -DNTHREADS -std=c18 -InKernel  test-pedir.c pedir.c nKernel/nthread.c nKernel/nutil.c nKernel/ntime.c nKernel/pss.c nKernel/sched-fcfs.c nKernel/sched-rr.c nKernel/sched-pri-1core.c nKernel/sched-fcfs-1core.c nKernel/sem.c nKernel/mutex-cond.c nKernel/nmsgs.c nKernel/nsystem.c -lm -lpthread -lrt -o pedir.bin-g
+--------------------------------------------
+./pedir.bin-g  
+Info: setting single-core FCFS scheduling
+El ejemplo del enunciado
+------------------------
+
+Tpo=0: T1 (thread 1) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:                     T3 (thread 2) invoca nPedir(0)
+Tpo=2:           T2 (thread 3) invoca nPedir(1)
+Tpo=3:                                         T5 (thread 4) invoca nPedir(0)
+Tpo=3: Esperando que T1 termine
+Tpo=4: T1 devuelve recurso
+Tpo=4:           T2 cat 1 obtiene recurso
+Tpo=4: T1 termino
+Tpo=5:                               T4 (thread 5) invoca nPedir(1)
+Tpo=6:           T2 devuelve recurso
+Tpo=6:           Esperando que T2 termine
+Tpo=6:           T2 termino
+Tpo=6:                     Esperando que T3 termine
+Tpo=6:                     T3 cat 0 obtiene recurso
+Tpo=7:                     T3 devuelve recurso
+Tpo=7:                               T4 cat 1 obtiene recurso
+Tpo=7:                     T3 termino
+Tpo=7:                               Esperando que T4 termine
+Tpo=8:                               T4 devuelve recurso
+Tpo=8:                                         T5 cat 0 obtiene recurso
+Tpo=8:                               T4 termino
+Tpo=8:                                         Esperando que T5 termine
+Tpo=9:                                         T5 devuelve recurso
+Tpo=9:                                         T5 termino
+
+Test timeout 1, revisamos que se respete el timeout 4
+----------------
+
+Tpo=0: T1 (thread 6) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 7) invoca nPedir(0)
+Tpo=2:                               T4 (thread 8) invoca nPedir(0)
+Tpo=5:           T2 (thread 7) Timeout!! ta=5 to=4
+Tpo=5:                     T3 (thread 9) invoca nPedir(0)
+Tpo=10: T1 devuelve recurso
+Tpo=10:                               T4 cat 0 obtiene recurso
+Tpo=10:                                         T5 (thread 10) invoca nPedir(1)
+Tpo=11:                                                   T6 (thread 11) invoca nPedir(1)
+Tpo=12:                               T4 devuelve recurso
+Tpo=12:                                         T5 cat 1 obtiene recurso
+Tpo=14:                                         T5 devuelve recurso
+Tpo=14:                     T3 cat 0 obtiene recurso
+Tpo=16:                     T3 devuelve recurso
+Tpo=16:                                                   T6 cat 1 obtiene recurso
+Tpo=18:                                                   T6 devuelve recurso
+
+Test timeout 2, revisamos que toma el recurso antes del timeout
+----------------
+
+Tpo=0: T1 (thread 12) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 13) invoca nPedir(0)
+Tpo=5: T1 devuelve recurso
+Tpo=5:           T2 cat 0 obtiene recurso
+Tpo=7:           T2 devuelve recurso
+
+Test de robustez
+----------------
+
+
+Toma un poco mas de 10 segundos
+t1 t2 t3 ... significa que ese thread comenzo a trabajar
+
+Core 0, cat 0 
+
+t14 Core 1, cat 1 
+
+t15 Core 2, cat 0 
+
+t16 Core 3, cat 1 
+
+t17 Core 4, cat 0 
+
+t18 Core 5, cat 1 
+
+t19 Core 6, cat 0 
+
+t20 Core 7, cat 1 
+
+t21 
+Numero de entradas/salidas = 3140578
+En mi computador make run reporto unas 10 mil entradas/salidas con 3 threads
+
+Felicitaciones: funciona
+Info: Number of cores = 1
+Info: total context changes = 72
+Info: Implicit context changes = 0
+--------------------------------------------
+./pedir.bin-g -slice 1 -ncores 4
+Info: setting 4-core round robin scheduling
+El ejemplo del enunciado
+------------------------
+
+Tpo=0: T1 (thread 1) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:                     T3 (thread 2) invoca nPedir(0)
+Tpo=2:           T2 (thread 3) invoca nPedir(1)
+Tpo=3:                                         T5 (thread 4) invoca nPedir(0)
+Tpo=3: Esperando que T1 termine
+Tpo=4: T1 devuelve recurso
+Tpo=4:           T2 cat 1 obtiene recurso
+Tpo=4: T1 termino
+Tpo=5:                               T4 (thread 5) invoca nPedir(1)
+Tpo=6:           T2 devuelve recurso
+Tpo=6:                     T3 cat 0 obtiene recurso
+Tpo=6:           Esperando que T2 termine
+Tpo=6:           T2 termino
+Tpo=6:                     Esperando que T3 termine
+Tpo=7:                     T3 devuelve recurso
+Tpo=7:                               T4 cat 1 obtiene recurso
+Tpo=7:                     T3 termino
+Tpo=7:                               Esperando que T4 termine
+Tpo=8:                               T4 devuelve recurso
+Tpo=8:                                         T5 cat 0 obtiene recurso
+Tpo=8:                               T4 termino
+Tpo=8:                                         Esperando que T5 termine
+Tpo=9:                                         T5 devuelve recurso
+Tpo=9:                                         T5 termino
+
+Test timeout 1, revisamos que se respete el timeout 4
+----------------
+
+Tpo=0: T1 (thread 6) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 7) invoca nPedir(0)
+Tpo=2:                               T4 (thread 8) invoca nPedir(0)
+Tpo=5:           T2 (thread 7) Timeout!! ta=5 to=4
+Tpo=5:                     T3 (thread 9) invoca nPedir(0)
+Tpo=10: T1 devuelve recurso
+Tpo=10:                               T4 cat 0 obtiene recurso
+Tpo=10:                                         T5 (thread 10) invoca nPedir(1)
+Tpo=11:                                                   T6 (thread 11) invoca nPedir(1)
+Tpo=12:                               T4 devuelve recurso
+Tpo=12:                                         T5 cat 1 obtiene recurso
+Tpo=14:                                         T5 devuelve recurso
+Tpo=14:                     T3 cat 0 obtiene recurso
+Tpo=16:                     T3 devuelve recurso
+Tpo=16:                                                   T6 cat 1 obtiene recurso
+Tpo=18:                                                   T6 devuelve recurso
+
+Test timeout 2, revisamos que toma el recurso antes del timeout
+----------------
+
+Tpo=0: T1 (thread 12) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 13) invoca nPedir(0)
+Tpo=5: T1 devuelve recurso
+Tpo=5:           T2 cat 0 obtiene recurso
+Tpo=7:           T2 devuelve recurso
+
+Test de robustez
+----------------
+
+
+Toma un poco mas de 10 segundos
+t1 t2 t3 ... significa que ese thread comenzo a trabajar
+
+Core 0, cat 0 
+
+t14 Core 1, cat 1 
+
+t15 Core 2, cat 0 
+
+t16 Core 3, cat 1 
+
+t17 Core 4, cat 0 
+
+t18 Core 5, cat 1 
+
+t19 Core 6, cat 0 
+
+t20 Core 7, cat 1 
+
+t21 
+Numero de entradas/salidas = 178528
+En mi computador make run reporto unas 10 mil entradas/salidas con 3 threads
+
+Felicitaciones: funciona
+Info: Number of cores = 4
+Info: total context changes = 107499
+Info: Implicit context changes = 47
+==== run ====
+gcc -g -O -DOPT=1 -Wall -Werror -pedantic -DNTHREADS -std=c18 -InKernel  test-pedir.c pedir.c nKernel/nthread.c nKernel/nutil.c nKernel/ntime.c nKernel/pss.c nKernel/sched-fcfs.c nKernel/sched-rr.c nKernel/sched-pri-1core.c nKernel/sched-fcfs-1core.c nKernel/sem.c nKernel/mutex-cond.c nKernel/nmsgs.c nKernel/nsystem.c -lm -lpthread -lrt -o pedir.bin
+--------------------------------------------
+./pedir.bin
+Info: setting single-core FCFS scheduling
+El ejemplo del enunciado
+------------------------
+
+Tpo=0: T1 (thread 1) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:                     T3 (thread 2) invoca nPedir(0)
+Tpo=2:           T2 (thread 3) invoca nPedir(1)
+Tpo=3:                                         T5 (thread 4) invoca nPedir(0)
+Tpo=3: Esperando que T1 termine
+Tpo=4: T1 devuelve recurso
+Tpo=4:           T2 cat 1 obtiene recurso
+Tpo=4: T1 termino
+Tpo=5:                               T4 (thread 5) invoca nPedir(1)
+Tpo=6:           T2 devuelve recurso
+Tpo=6:           Esperando que T2 termine
+Tpo=6:           T2 termino
+Tpo=6:                     Esperando que T3 termine
+Tpo=6:                     T3 cat 0 obtiene recurso
+Tpo=7:                     T3 devuelve recurso
+Tpo=7:                               T4 cat 1 obtiene recurso
+Tpo=7:                     T3 termino
+Tpo=7:                               Esperando que T4 termine
+Tpo=8:                               T4 devuelve recurso
+Tpo=8:                                         T5 cat 0 obtiene recurso
+Tpo=8:                               T4 termino
+Tpo=8:                                         Esperando que T5 termine
+Tpo=9:                                         T5 devuelve recurso
+Tpo=9:                                         T5 termino
+
+Test timeout 1, revisamos que se respete el timeout 4
+----------------
+
+Tpo=0: T1 (thread 6) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 7) invoca nPedir(0)
+Tpo=2:                               T4 (thread 8) invoca nPedir(0)
+Tpo=5:           T2 (thread 7) Timeout!! ta=5 to=4
+Tpo=5:                     T3 (thread 9) invoca nPedir(0)
+Tpo=10: T1 devuelve recurso
+Tpo=10:                               T4 cat 0 obtiene recurso
+Tpo=10:                                         T5 (thread 10) invoca nPedir(1)
+Tpo=11:                                                   T6 (thread 11) invoca nPedir(1)
+Tpo=12:                               T4 devuelve recurso
+Tpo=12:                                         T5 cat 1 obtiene recurso
+Tpo=14:                                         T5 devuelve recurso
+Tpo=14:                     T3 cat 0 obtiene recurso
+Tpo=16:                     T3 devuelve recurso
+Tpo=16:                                                   T6 cat 1 obtiene recurso
+Tpo=18:                                                   T6 devuelve recurso
+
+Test timeout 2, revisamos que toma el recurso antes del timeout
+----------------
+
+Tpo=0: T1 (thread 12) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 13) invoca nPedir(0)
+Tpo=5: T1 devuelve recurso
+Tpo=5:           T2 cat 0 obtiene recurso
+Tpo=7:           T2 devuelve recurso
+
+Test de robustez
+----------------
+
+
+Toma un poco mas de 10 segundos
+t1 t2 t3 ... significa que ese thread comenzo a trabajar
+
+Core 0, cat 0 
+
+t14 Core 1, cat 1 
+
+t15 Core 2, cat 0 
+
+t16 Core 3, cat 1 
+
+t17 Core 4, cat 0 
+
+t18 Core 5, cat 1 
+
+t19 Core 6, cat 0 
+
+t20 Core 7, cat 1 
+
+t21 
+Numero de entradas/salidas = 3069638
+En mi computador make run reporto unas 10 mil entradas/salidas con 3 threads
+
+Felicitaciones: funciona
+Info: Number of cores = 1
+Info: total context changes = 72
+Info: Implicit context changes = 0
+--------------------------------------------
+./pedir.bin -ncores 4
+Info: setting 4-core FCFS scheduling
+El ejemplo del enunciado
+------------------------
+
+Tpo=0: T1 (thread 1) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:                     T3 (thread 2) invoca nPedir(0)
+Tpo=2:           T2 (thread 3) invoca nPedir(1)
+Tpo=3:                                         T5 (thread 4) invoca nPedir(0)
+Tpo=3: Esperando que T1 termine
+Tpo=4: T1 devuelve recurso
+Tpo=4:           T2 cat 1 obtiene recurso
+Tpo=4: T1 termino
+Tpo=5:                               T4 (thread 5) invoca nPedir(1)
+Tpo=6:           T2 devuelve recurso
+Tpo=6:                     T3 cat 0 obtiene recurso
+Tpo=6:           Esperando que T2 termine
+Tpo=6:           T2 termino
+Tpo=6:                     Esperando que T3 termine
+Tpo=7:                     T3 devuelve recurso
+Tpo=7:                               T4 cat 1 obtiene recurso
+Tpo=7:                     T3 termino
+Tpo=7:                               Esperando que T4 termine
+Tpo=8:                               T4 devuelve recurso
+Tpo=8:                                         T5 cat 0 obtiene recurso
+Tpo=8:                               T4 termino
+Tpo=8:                                         Esperando que T5 termine
+Tpo=9:                                         T5 devuelve recurso
+Tpo=9:                                         T5 termino
+
+Test timeout 1, revisamos que se respete el timeout 4
+----------------
+
+Tpo=0: T1 (thread 6) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 7) invoca nPedir(0)
+Tpo=2:                               T4 (thread 8) invoca nPedir(0)
+Tpo=5:           T2 (thread 7) Timeout!! ta=5 to=4
+Tpo=5:                     T3 (thread 9) invoca nPedir(0)
+Tpo=10: T1 devuelve recurso
+Tpo=10:                               T4 cat 0 obtiene recurso
+Tpo=10:                                         T5 (thread 10) invoca nPedir(1)
+Tpo=11:                                                   T6 (thread 11) invoca nPedir(1)
+Tpo=12:                               T4 devuelve recurso
+Tpo=12:                                         T5 cat 1 obtiene recurso
+Tpo=14:                                         T5 devuelve recurso
+Tpo=14:                     T3 cat 0 obtiene recurso
+Tpo=16:                     T3 devuelve recurso
+Tpo=16:                                                   T6 cat 1 obtiene recurso
+Tpo=18:                                                   T6 devuelve recurso
+
+Test timeout 2, revisamos que toma el recurso antes del timeout
+----------------
+
+Tpo=0: T1 (thread 12) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 13) invoca nPedir(0)
+Tpo=5: T1 devuelve recurso
+Tpo=5:           T2 cat 0 obtiene recurso
+Tpo=7:           T2 devuelve recurso
+
+Test de robustez
+----------------
+
+
+Toma un poco mas de 10 segundos
+t1 t2 t3 ... significa que ese thread comenzo a trabajar
+
+Core 0, cat 0 
+
+t14 Core 1, cat 1 
+
+t15 Core 2, cat 0 
+
+t16 Core 3, cat 1 
+
+t17 Core 4, cat 0 
+
+t18 Core 5, cat 1 
+
+t19 Core 6, cat 0 
+
+t20 Core 7, cat 1 
+
+t21 
+Numero de entradas/salidas = 198858
+En mi computador make run reporto unas 10 mil entradas/salidas con 3 threads
+
+Felicitaciones: funciona
+Info: Number of cores = 4
+Info: total context changes = 115081
+Info: Implicit context changes = 0
+--------------------------------------------
+./pedir.bin -slice 1 -ncores 4
+Info: setting 4-core round robin scheduling
+El ejemplo del enunciado
+------------------------
+
+Tpo=0: T1 (thread 1) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:                     T3 (thread 2) invoca nPedir(0)
+Tpo=2:           T2 (thread 3) invoca nPedir(1)
+Tpo=3:                                         T5 (thread 4) invoca nPedir(0)
+Tpo=3: Esperando que T1 termine
+Tpo=4: T1 devuelve recurso
+Tpo=4:           T2 cat 1 obtiene recurso
+Tpo=4: T1 termino
+Tpo=5:                               T4 (thread 5) invoca nPedir(1)
+Tpo=6:           T2 devuelve recurso
+Tpo=6:                     T3 cat 0 obtiene recurso
+Tpo=6:           Esperando que T2 termine
+Tpo=6:           T2 termino
+Tpo=6:                     Esperando que T3 termine
+Tpo=7:                     T3 devuelve recurso
+Tpo=7:                     T3 termino
+Tpo=7:                               Esperando que T4 termine
+Tpo=7:                               T4 cat 1 obtiene recurso
+Tpo=8:                               T4 devuelve recurso
+Tpo=8:                               T4 termino
+Tpo=8:                                         Esperando que T5 termine
+Tpo=8:                                         T5 cat 0 obtiene recurso
+Tpo=9:                                         T5 devuelve recurso
+Tpo=9:                                         T5 termino
+
+Test timeout 1, revisamos que se respete el timeout 4
+----------------
+
+Tpo=0: T1 (thread 6) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 7) invoca nPedir(0)
+Tpo=2:                               T4 (thread 8) invoca nPedir(0)
+Tpo=5:           T2 (thread 7) Timeout!! ta=5 to=4
+Tpo=5:                     T3 (thread 9) invoca nPedir(0)
+Tpo=10: T1 devuelve recurso
+Tpo=10:                               T4 cat 0 obtiene recurso
+Tpo=10:                                         T5 (thread 10) invoca nPedir(1)
+Tpo=11:                                                   T6 (thread 11) invoca nPedir(1)
+Tpo=12:                               T4 devuelve recurso
+Tpo=12:                                         T5 cat 1 obtiene recurso
+Tpo=14:                                         T5 devuelve recurso
+Tpo=14:                     T3 cat 0 obtiene recurso
+Tpo=16:                     T3 devuelve recurso
+Tpo=16:                                                   T6 cat 1 obtiene recurso
+Tpo=18:                                                   T6 devuelve recurso
+
+Test timeout 2, revisamos que toma el recurso antes del timeout
+----------------
+
+Tpo=0: T1 (thread 12) invoca nPedir(0)
+Tpo=0: T1 cat 0 obtiene recurso
+Tpo=1:           T2 (thread 13) invoca nPedir(0)
+Tpo=5: T1 devuelve recurso
+Tpo=5:           T2 cat 0 obtiene recurso
+Tpo=7:           T2 devuelve recurso
+
+Test de robustez
+----------------
+
+
+Toma un poco mas de 10 segundos
+t1 t2 t3 ... significa que ese thread comenzo a trabajar
+
+Core 0, cat 0 
+
+t14 Core 1, cat 1 
+
+t15 Core 2, cat 0 
+
+t16 Core 3, cat 1 
+
+t17 Core 4, cat 0 
+
+t18 Core 5, cat 1 
+
+t19 Core 6, cat 0 
+
+t20 Core 7, cat 1 
+
+t21 
+Numero de entradas/salidas = 160228
+En mi computador make run reporto unas 10 mil entradas/salidas con 3 threads
+
+Felicitaciones: funciona
+Info: Number of cores = 4
+Info: total context changes = 96173
+Info: Implicit context changes = 68
