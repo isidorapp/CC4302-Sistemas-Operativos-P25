@@ -1,0 +1,308 @@
+Sistema operativo utilizado
+Linux debian12 6.1.0-18-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.76-1 (2024-02-01) x86_64 GNU/Linux
+==== run-san ====
+gcc -g -DSAN=1 -fsanitize=address -fsanitize=undefined -Wall -Werror -pedantic -std=c18  test-disco.c disco.c pss.c spinlocks.c swap-x86_64.s -lm -lpthread -o disco.bin-san
+./disco.bin-san
+Prueba con spinlocks implementados con mutex sin busywaiting
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de eva es adan
+La pareja de adan es eva
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de ana es pedro
+La pareja de pedro es ana
+juan espera pareja
+La pareja de sara es juan
+La pareja de juan es sara
+diego espera pareja
+alba espera pareja
+La pareja de diego es alba
+La pareja de alba es diego
+Aprobado
+Test: Orden de llegada de los varones
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: Orden de llegada de las damas
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: robustez
+Aprobado
+
+===============================================
+Prueba con spinlocks verdaderos con busywaiting
+===============================================
+
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de adan es eva
+La pareja de eva es adan
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de pedro es ana
+La pareja de ana es pedro
+juan espera pareja
+La pareja de juan es sara
+La pareja de sara es juan
+diego espera pareja
+alba espera pareja
+La pareja de alba es diego
+La pareja de diego es alba
+Aprobado
+Test: Orden de llegada de los varones
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: Orden de llegada de las damas
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: robustez
+Aprobado
+Felicitaciones: aprobo todos los tests
+==== run-g ====
+gcc -g -Wall -Werror -pedantic -std=c18  test-disco.c disco.c pss.c spinlocks.c swap-x86_64.s -lm -lpthread -o disco.bin-g
+./disco.bin-g
+Prueba con spinlocks implementados con mutex sin busywaiting
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de eva es adan
+La pareja de adan es eva
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de ana es pedro
+La pareja de pedro es ana
+juan espera pareja
+La pareja de sara es juan
+La pareja de juan es sara
+diego espera pareja
+alba espera pareja
+La pareja de diego es alba
+La pareja de alba es diego
+Aprobado
+Test: Orden de llegada de los varones
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: Orden de llegada de las damas
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: robustez
+Aprobado
+
+===============================================
+Prueba con spinlocks verdaderos con busywaiting
+===============================================
+
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de adan es eva
+La pareja de eva es adan
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de pedro es ana
+La pareja de ana es pedro
+juan espera pareja
+La pareja de juan es sara
+La pareja de sara es juan
+diego espera pareja
+alba espera pareja
+La pareja de alba es diego
+La pareja de diego es alba
+Aprobado
+Test: Orden de llegada de los varones
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: Orden de llegada de las damas
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: robustez
+Aprobado
+Felicitaciones: aprobo todos los tests
+==== run ====
+gcc -O -DOPT=1 -Wall -Werror -pedantic -std=c18  test-disco.c disco.c pss.c spinlocks.c swap-x86_64.s -lm -lpthread -o disco.bin
+./disco.bin
+Prueba con spinlocks implementados con mutex sin busywaiting
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de eva es adan
+La pareja de adan es eva
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de pedro es ana
+La pareja de ana es pedro
+juan espera pareja
+La pareja de sara es juan
+La pareja de juan es sara
+diego espera pareja
+alba espera pareja
+La pareja de diego es alba
+La pareja de alba es diego
+Aprobado
+Test: Orden de llegada de los varones
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: Orden de llegada de las damas
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: robustez
+Aprobado
+
+===============================================
+Prueba con spinlocks verdaderos con busywaiting
+===============================================
+
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de adan es eva
+La pareja de eva es adan
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de pedro es ana
+La pareja de ana es pedro
+juan espera pareja
+La pareja de juan es sara
+La pareja de sara es juan
+diego espera pareja
+alba espera pareja
+La pareja de alba es diego
+La pareja de diego es alba
+Aprobado
+Test: Orden de llegada de los varones
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: Orden de llegada de las damas
+thread 0 created
+thread 1 created
+thread 2 created
+thread 3 created
+thread 4 created
+thread 0 joined
+thread 1 joined
+thread 2 joined
+thread 3 joined
+thread 4 joined
+Aprobado
+Test: robustez
+Aprobado
+Felicitaciones: aprobo todos los tests
